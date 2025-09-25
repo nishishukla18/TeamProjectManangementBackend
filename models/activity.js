@@ -1,6 +1,6 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
-const activityLogSchema = new Schema(
+const activityLogSchema = new mongoose.Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -35,7 +35,7 @@ const activityLogSchema = new Schema(
       enum: ["Task", "Project", "Workspace", "Comment", "User"],
     },
     resourceId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
     details: {
