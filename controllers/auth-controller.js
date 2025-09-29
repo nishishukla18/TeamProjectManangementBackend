@@ -4,104 +4,27 @@ import userModel from '../models/userModel.js';
 import transporter from '../configs/nodemailer.js';
 
 
-// export const register = async(req,res)=>{
-//     const {name,email,password} = req.body;
-//     //checking if any field in missing
-//     if(!name||!email||!password){
-//         return res.json({success:false,message:"Mising details"})
-//     }
-//     try {
-//         //checking if user exist with the entered email
-//         const existingUser =await userModel.findOne({email})
-//         if(existingUser){
-//             return res.json({success:false,message:"user already exists"})
-//         }
-//         //hashinf the password
-//         const hashedPassword = await bcrypt.hash(password,10)
-
-//         //creating new user
-//         const user = new userModel({name,email,password:hashedPassword})
-//         //saving the created user in the database
-//         await user.save()
-
-//         //generating token
-//         const token = jwt.sign({id:user._id},process.env.SECRET_KEY,{expiresIn:'7d'})
-
-//         res.cookie('token',token,{
-//             httpOnly:true,
-//             secure:process.env.NODE_ENV==='production',
-//             sameSite:process.env.NODE_ENV==='production'?'none':'strict',
-//             maxAge:7*24*60*60*1000
-
-//         })
-//         const mailOptions = {
-//             from:process.env.SENDER_EMAIL,
-//             to:email,
-//             subject:'Welcome to my website',
-//             text:`Welcome to my website.Your account has been created with email id: ${email}`
-
-//         }
-//         await transporter.sendMail(mailOptions)
-//         return res.json({success:true})
-//     } catch (error) {
-//         return res.json({success:false,message:error.message})
-//     }
-// }
-// export const login = async(req,res)=>{
-//      const {email,password} = req.body;
-//      if(!email||!password){
-//         return res.json({success:false,message:"Mising details"})
-//     }
-//     try {
-//         const user = await userModel.findOne({email})
-//         if(!user){
-//              return res.json({success:false,message:"user not exists"})
-//         }
-//         const isMatch = await bcrypt.compare(password,user.password)
-//         if(!isMatch){
-//             return res.json({success:false,message:"invalid password"})
-//         }
-//         const token = jwt.sign({id:user._id},process.env.SECRET_KEY,{expiresIn:'7d'})
-
-//         res.cookie('token',token,{
-//             httpOnly:true,
-//             secure:process.env.NODE_ENV==='production',
-//             sameSite:process.env.NODE_ENV==='production'?'none':'strict',
-//             maxAge:7*24*60*60*1000
-
-//         })
-//         return res.json({success:true})
-//     } catch (error) {
-//         return res.json({success:false,message:error.message})
-//     }
-// }
 export const register = async(req,res)=>{
     const {name,email,password} = req.body;
+    //checking if any field in missing
     if(!name||!email||!password){
         return res.json({success:false,message:"Mising details"})
     }
     try {
+        //checking if user exist with the entered email
         const existingUser =await userModel.findOne({email})
         if(existingUser){
             return res.json({success:false,message:"user already exists"})
         }
+        //hashing the password
         const hashedPassword = await bcrypt.hash(password,10)
 
-        // Generate OTP for verification
-        const otp = String(Math.floor(100000 + Math.random() * 900000));
-        const otpExpiry = Date.now() + 24*60*60*1000; // 24 hours
+        //creating new user
+        const user = new userModel({name,email,password:hashedPassword})
+        //saving the created user in the database
+        await user.save()
 
-        // Create new user with OTP fields
-        const user = new userModel({
-            name,
-            email,
-            password: hashedPassword,
-            verifyOtp: otp,
-            verifyOtpExpiredAt: otpExpiry
-        });
-        await user.save();
-
-        // Generate token
+        //generating token
         const token = jwt.sign({id:user._id},process.env.SECRET_KEY,{expiresIn:'7d'})
 
         res.cookie('token',token,{
@@ -109,32 +32,17 @@ export const register = async(req,res)=>{
             secure:process.env.NODE_ENV==='production',
             sameSite:process.env.NODE_ENV==='production'?'none':'strict',
             maxAge:7*24*60*60*1000
-        });
 
-        // Send welcome email
+        })
         const mailOptions = {
-            from: process.env.SENDER_EMAIL,
-            to: email,
-            subject: 'Welcome to my website',
-            text: `Welcome to my website. Your account has been created with email id: ${email}`
-        };
-        await transporter.sendMail(mailOptions);
+            from:process.env.SENDER_EMAIL,
+            to:email,
+            subject:'Welcome to my website',
+            text:`Welcome to my website.Your account has been created with email id: ${email}`
 
-        // Send verification OTP email
-        const otpMailOptions = {
-            from: process.env.SENDER_EMAIL,
-            to: email,
-            subject: 'Account Verification OTP',
-            text: `Your OTP for verifying your account is: ${otp}.`
-        };
-        await transporter.sendMail(otpMailOptions);
-
-        return res.json({
-        success: true,
-        message: "Registration successful. Please check your email for the verification OTP.",
-        userId: user._id
-        });
-        
+        }
+        await transporter.sendMail(mailOptions)
+        return res.json({success:true})
     } catch (error) {
         return res.json({success:false,message:error.message})
     }
@@ -148,10 +56,6 @@ export const login = async(req,res)=>{
         const user = await userModel.findOne({email})
         if(!user){
              return res.json({success:false,message:"user not exists"})
-        }
-        // Check if account is verified
-        if(!user.isAccountVerified){
-            return res.json({success:false,message:"Please verify your email before logging in."})
         }
         const isMatch = await bcrypt.compare(password,user.password)
         if(!isMatch){
