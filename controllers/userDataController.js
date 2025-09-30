@@ -2,8 +2,8 @@ import userModel from "../../Backend/models/userModel.js";
 
 export const getUserData = async(req,res)=>{
     try {
-        console.log("userId from middleware:", req.userId);
-        const userId = req.userId
+        console.log("userId from middleware:", req.user.id);
+        const userId = req.user.id
         const user = await userModel.findById(userId)
         if(!user){
            return res.json({success:false,message:"user not found"})

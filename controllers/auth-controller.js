@@ -89,7 +89,8 @@ export const logout = async(req,res)=>{
 }
 export const sendVerifyOtp = async(req,res)=>{
     try {
-        const {userId} = req.body;
+        //const {userId} = req.body;
+         const userId = req.user.id; // ✅ take from middleware
         const user = await userModel.findById(userId)
         if(user.isAccountVerified){
             return res.json({success:false,message:"Account already verified"})
@@ -112,7 +113,9 @@ export const sendVerifyOtp = async(req,res)=>{
     }
 }
 export const verifyEmail = async(req,res)=>{
-    const {userId,otp} = req.body;
+    // const {userId,otp} = req.body;
+     const { otp } = req.body;
+     const userId = req.user.id; // ✅ from middleware
     if(!userId || !otp){
         return res.json({success:false,message:"Mising details"})
     }
