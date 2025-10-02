@@ -1,35 +1,13 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
-const workspaceModel = new Schema(
+const workspaceSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    description: { type: String, trim: true },
-    color: { type: String, default: "#FF5733" },
-    owner: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    members: [
-      {
-        user: { type: Schema.Types.ObjectId, ref: "User" },
-        role: {
-          type: String,
-          enum: ["owner", "member", "admin", "viewer"],
-          default: "member",
-        },
-        joinedAt: { type: Date, default: Date.now },
-      },
-    ],
-    projects: [{ type: Schema.Types.ObjectId, ref: "Project" }],
+    title: { type: String, required: true },
+    description: { type: String },
+    createdBy: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true } // adds createdAt and updatedAt automatically
 );
 
-const Workspace = mongoose.model("Workspace", workspaceModel);
-
+const Workspace = mongoose.model("Workspace", workspaceSchema);
 export default Workspace;

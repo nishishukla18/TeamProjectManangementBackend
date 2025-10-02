@@ -5,6 +5,8 @@ import express from "express";
 import connectDB from "./configs/db.js";
 import userRoutes from "./routes/userRoutes.js"
 import userDataRoutes from "./routes/userDataRoutes.js"
+import workspaceRoues from "./routes/workspaceRoutes.js"
+import projectRoutes from "./routes/projectRoutes.js"
 import cookieParser from "cookie-parser";
 
 
@@ -23,6 +25,8 @@ app.get("/", (req, res) => {
 });
 app.use("/api/auth",userRoutes)
 app.use("/api/user",userDataRoutes)
+app.use("/api/workspace",workspaceRoues)
+app.use("/api/projects",projectRoutes)
 
 //console.log(process.env.PORT)
 app.listen(PORT, () => {
