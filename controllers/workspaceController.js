@@ -24,3 +24,12 @@ export const getWorkspaces = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch workspaces", error });
   }
 };
+export const getWorkspaceById = async (req, res) => {
+  try {
+    const workspace = await Workspace.findById(req.params.id);
+    if (!workspace) return res.status(404).json({ success: false, message: "Workspace not found" });
+    res.json(workspace);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
